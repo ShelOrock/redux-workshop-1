@@ -41,11 +41,14 @@
       const { createStore, combineReducers } = Redux;
       const { HashRouter, Link, Switch, Route } = ReactRouterDOM;
 
-      const initialState = { events: [], something: [] };
+      const initialState = { events: [] };
 
       const reducer = (state = initialState, action) => {
         let events;
         switch (action.type) {
+          case 'getEvents':
+            events = action.data
+            return { ...state, events };
           case 'addEvent':
             events = [...state.events, { ...action.data }];
             return { ...state, events };
@@ -58,6 +61,14 @@
       };
 
       const store = createStore(reducer);
+
+      const getEvents = axios.get('/api/events')
+      .then(res => {
+        store.dispatch({
+          type: 'getEvents',
+          data:  res.data
+        })
+      })
 
       const connect = Component => {
         class Connected extends React.Component {
